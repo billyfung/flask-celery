@@ -7,7 +7,3 @@ RUN pip install pipenv
 ENV FLASK_ENV=production
 
 RUN pipenv install --system --deploy
-
-EXPOSE 5000
-
-CMD python app/app.py

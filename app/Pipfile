@@ -9,7 +9,6 @@ verify_ssl = true
 flask = "*"
 celery = "*"
 redis = "*"
-pandas = "*"
 
 [requires]
 python_version = "3.7"
