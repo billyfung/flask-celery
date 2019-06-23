@@ -4,6 +4,9 @@ services:
     build:
       context: ./app
       dockerfile: Dockerfile
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
     ports:
         - "5000:5000"
     volumes:
@@ -13,13 +16,24 @@ services:
     command: python app/app.py
   worker:
     build:
-      context: ./app
+      context: ./task-queue
       dockerfile: Dockerfile
-    command: ./app/run_celery.sh
-    volumes:
-      - .:/app
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
     depends_on:
       - redis
+  monitor:
+    build:
+      context: ./task-queue
+      dockerfile: Dockerfile
+    ports:
+     - "5555:5555"
+    entrypoint: flower
+    command:  -A tasks --port=5555 --broker=redis://redis:6379/0
+    depends_on:
+      - redis
+      - worker
   redis:
     image: redis
     ports:
