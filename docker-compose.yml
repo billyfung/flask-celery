@@ -21,6 +21,18 @@ services:
     command: python run-worker.py
     depends_on:
       - redis
+  dashboard:
+    build: 
+      context: ./monitor
+      dockerfile: Dockerfile
+    environment:
+      - REDIS_URL=redis://redis:6379/0
+    ports:
+      - '9181:9181'
+    command: rq-dashboard -H redis
+    depends_on:
+       - redis
+       - worker
   redis:
     image: redis
     ports:
