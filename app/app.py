@@ -1,22 +1,21 @@
 from flask import Flask, url_for, jsonify
 from redis import Redis
-from decimal import Decimal
 from rq import Queue
 
 from tasks import process_task
 
 SAMPLE_DATA = {
     'uuid1': {
-        1: Decimal(1.2),
-        2: Decimal(1.5),
-        3: Decimal(0.3),
-        4: Decimal(0.1)
+        1: 1.2,
+        2: 1.5,
+        3: 0.3,
+        4: 0.1
     },
     'uuid2': {
-        1: Decimal(0.2),
-        2: Decimal(0.5),
-        3: Decimal(1.3),
-        4: Decimal(1.1)
+        1: 0.2,
+        2: 0.5,
+        3: 1.3,
+        4: 1.1
     }
 }
 
@@ -39,7 +38,7 @@ def process_data():
 @app.route('/check/<string:task_id>')
 def check_task(task_id: str) -> str:
     task = q.fetch_job(task_id)
-    if task:
+    if task.get_status() == 'finished':
         response_object = {
             'status': 'success',
             'data': {
@@ -48,6 +47,8 @@ def check_task(task_id: str) -> str:
                 'task_result': task.result,
             }
         }
+    elif task.get_status() == 'started':
+        response_object = {'status': 'working on it'}
     else:
         response_object = {'status': 'error'}
     return jsonify(response_object)
