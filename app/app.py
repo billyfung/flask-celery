@@ -1,6 +1,6 @@
 from flask import Flask, url_for, jsonify
 from redis import Redis
-from rq import Queue
+from rq import Queue, Connection
 
 from tasks import process_task
 
@@ -22,7 +22,6 @@ SAMPLE_DATA = {
 # initialise the app
 app = Flask(__name__)
 redis = Redis(host='redis', port=6379)
-q = Queue(connection=redis)
 
 @app.route('/')
 def hello():
@@ -31,8 +30,10 @@ def hello():
 
 @app.route('/process')
 def process_data():
-    job = q.enqueue(process_task, SAMPLE_DATA)
-    response = f"<a href='{url_for('check_task', task_id=job.get_id(), external=True)}'>check status of {job.get_id()} </a>"
+    with Connection():
+        q = Queue(connection=redis)
+        job = q.enqueue(process_task, SAMPLE_DATA)
+        response = f"<a href='{url_for('check_task', task_id=job.get_id(), external=True)}'>check status of {job.get_id()} </a>"
     return response
 
 @app.route('/check/<string:task_id>')
