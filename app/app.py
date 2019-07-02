@@ -6,18 +6,9 @@ import celery.states as states
 
 
 SAMPLE_DATA = {
-    'uuid1': {
-        1: Decimal(1.2),
-        2: Decimal(1.5),
-        3: Decimal(0.3),
-        4: Decimal(0.1)
-    },
-    'uuid2': {
-        1: Decimal(0.2),
-        2: Decimal(0.5),
-        3: Decimal(1.3),
-        4: Decimal(1.1)
-    }
+    'A': 1,
+    'B': 2,
+    'C': 4
 }
 
 # initialise the app

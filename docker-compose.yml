@@ -14,6 +14,8 @@ services:
     depends_on:
         - redis
     command: python app/app.py
+    networks:
+      - webnet
   worker:
     build:
       context: ./task-queue
@@ -23,6 +25,9 @@ services:
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
     depends_on:
       - redis
+      - db
+    networks:
+      - webnet
   monitor:
     build:
       context: ./task-queue
@@ -34,7 +39,28 @@ services:
     depends_on:
       - redis
       - worker
+    networks:
+      - webnet
   redis:
     image: redis
     ports:
       - "6379:6379"
+    networks:
+      - webnet
+  db:
+    container_name: db
+    restart: always
+    image: postgres:10
+    environment:
+      - POSTGRES_USER=testuser
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=testdb
+    volumes:
+      - ./initdb.sql:/docker-entrypoint-initdb.d/initdb.sql
+    ports:
+      - "5432:5432"
+    networks:
+      - webnet
+
+networks:
+  webnet:
