@@ -23,7 +23,7 @@ celery = Celery(
 DB_CONN = "dbname=testdb user=testuser password=password host=db"
 INSERT_SQL = """
     insert into test_table (col_a, col_b, test_value) 
-    values (%s, %s)
+    values (%s, %s, %s);
 """
 
 @celery.task(name='tasks.process', ignore_result=True)
